@@ -1,0 +1,17 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial;
+}
+
+h1 {
+	position: absolute;
+	bottom: 0px;
+	left: 20px;
+	color: #ddd;
+	font-size: 40px;
+	transform: rotate(-90deg);
+	text-transform: uppercase;
+	transform-origin:  0 0;
+}
