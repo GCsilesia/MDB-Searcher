@@ -42,6 +42,9 @@
 		searcher.setAttribute("placeholder","Search");
 		
 		view.appendChild(searcher);
+
+		this.node = searcher; 
+		this.event = 'keyup';
 	}
 
 	/**
@@ -98,12 +101,6 @@
 			return resultObj;
 		}
 	}
-
-	var appObject = new AppObject(appContainerId);
-	var searchObject = new SearchObject(appObject);
-	var resultObject = new ResultObject(appObject);
-	var infoObject = new InfoObject(appObject);
-
 
 	/**
 	 * Info View Object.
@@ -166,5 +163,107 @@
 		}
 	}
 
+/* CONTROLERS */
+
+	/**
+	 * ResultPrinter.
+	 * @constructor
+	 * @param {ResultObject} printObj - Result Object to print results.
+	 * @param {InfoObject} infoObject - Info Object to print clicked result info.
+	 */
+
+	function ResultPrinter(printObj,infoObj) {
+		var node = printObj.appender || null,
+			currentFilm = -1,
+			films = false,
+			setFilms = function(insertFilms) {
+				films = insertFilms || false;
+			}
+
+		this.print = function(insertFilms) {
+			setFilms(insertFilms);
+			if (node && films) {
+				var i,li,ul,id;
+
+				ul = printObj.makeContainer();
+
+				for (i=0; i<films.length; i++) {
+					li = printObj.makeResult(films[i]);
+					li.setAttribute('data-id', i );
+					li.addEventListener('click', function(){
+						currentFilm = this.getAttribute('data-id')
+						infoObj.print(films,currentFilm);
+					});
+					ul.appendChild(li);
+				}
+				node.innerHTML = '';
+				node.appendChild(ul);
+			}
+		}
+	}
+
+	/**
+	 * Responder.
+	 * @constructor
+	 * @param {function} writeResult - Call back function to print a response.
+	 */
+
+	function Responder(writeResult) {
+		var apiUrl ='https://api.themoviedb.org/3/search/movie',
+			apiKey = '3ec8025c2bdce32374786f4f443882d6',
+			printer =  writeResult,
+			films = [];
+
+		this.respond = function(e) {
+			var searchValue = e.target.value;
+			if (searchValue) {
+				var xhttp, 
+					url = apiUrl + "?api_key=" + apiKey + "&query=" + searchValue;
+	     		xhttp=new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+				    if (this.readyState == 4 && this.status == 200) {
+				       	films = JSON.parse(this.responseText).results;
+						printer(films);
+				    }
+				};
+				xhttp.open("GET", url, true);
+				xhttp.send();
+			} else {
+				films = [];
+				printer(films);
+			}
+		}
+	}
+
+	/**
+	 * Searcher.
+	 * @constructor
+	 * @param {SearchObject} searchObj - Search Object to bind search node, and proper event.
+	 * @param {function} callBack - Function Launched on event started.
+	 */
+
+	function Searcher(searchObj,callBack) {
+		var node = (searchObj.node && searchObj.node.nodeType === 1) ? searchObj.node : null, 
+			events = ['keyup','keydown','keypress','change','click','blur','focus'],
+			event = (events.filter(function(e) { return e === searchObj.event}).length===1) ? searchObj.event : 'keyup',
+			callBack = callBack || function() {
+				console.info('Searcher callBack function')
+			};
+		this.search = function() {
+			if (node) {
+				node.addEventListener(event, callBack);
+			}
+		}
+	}
+
+	var appObject = new AppObject(appContainerId);
+	var searchObject = new SearchObject(appObject);
+	var resultObject = new ResultObject(appObject);
+	var infoObject = new InfoObject(appObject);
+
+	var resultprinter = new ResultPrinter(resultObject,infoObject);
+	var responder = new Responder(resultprinter.print);
+	var searcher = new Searcher(searchObject,responder.respond);
+	searcher.search();
 
 })('app');
