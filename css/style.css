@@ -15,3 +15,22 @@ h1 {
 	text-transform: uppercase;
 	transform-origin:  0 0;
 }
+
+.view {
+	padding: 20px;
+	width: 25%;
+	background: #eee;
+	display: block;
+	float: left;
+}
+
+.info {
+	display: block;
+	height: 100%;
+	width: 75%;
+	background-color: #090208;
+	position: fixed;
+	right: 0;
+	top:0;
+	overflow-y: auto;
+}
