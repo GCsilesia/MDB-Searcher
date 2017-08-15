@@ -5,7 +5,7 @@
 	/**
 	 * Application View Object.
 	 * @constructor
-	 * @param {string} appContainerId - Aplication container ID.
+	 * @param {String} appContainerId - Aplication container ID.
 	 */
 
 	function AppObject(appContainerId) {
@@ -26,5 +26,25 @@
 		this.app = app;	
 	}
 
+
+	/**
+	 * Search View Object.
+	 * @constructor
+	 * @param {AppObject} app - Application View Object to append.
+	 */
+
+	function SearchObject(app) {
+		var	searcher, view = app.view;
+
+		searcher = document.createElement('input');
+		searcher.type = "text";
+		searcher.id = "searcher";
+		searcher.classList.add("searcher");
+		searcher.setAttribute("placeholder","Search");
+		
+		view.appendChild(searcher);
+	}
+
 	var appObject = new AppObject(appContainerId);
+	var searchObject = new SearchObject(appObject);
 })('app');
